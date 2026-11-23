@@ -1,0 +1,7 @@
+{
+  "uuid": "claude-usage-label@local",
+  "name": "Claude Usage Label",
+  "description": "Mostra na barra superior o uso do Claude (janela de 5h e semanal). Consulta somente leitura, não gasta tokens e nunca altera ~/.claude/.credentials.json.",
+  "shell-version": ["42"],
+  "version": 1
+}
