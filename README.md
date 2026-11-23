@@ -8,6 +8,8 @@ A tiny GNOME Shell extension that shows your **Claude usage** in the top bar:
 
 Click it for the time left until each limit resets. The label turns yellow at 75% and red at 90%.
 
+![Claude Usage Label in the GNOME top bar, with its menu open](docs/screenshot.png)
+
 > 🇧🇷 Versão em português: [README.pt-BR.md](README.pt-BR.md)
 
 > **Unofficial.** Not affiliated with or endorsed by Anthropic. It relies on an undocumented endpoint that can change or stop working at any time.

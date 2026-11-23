@@ -8,6 +8,8 @@ Uma extensão minúscula do GNOME Shell que mostra o seu **uso do Claude** na ba
 
 Clique nela para ver quanto tempo falta para cada limite reiniciar. O texto fica amarelo a partir de 75% e vermelho a partir de 90%.
 
+![Claude Usage Label na barra superior do GNOME, com o menu aberto](docs/screenshot.png)
+
 > 🇺🇸 English version: [README.md](README.md)
 
 > **Não oficial.** Sem relação com a Anthropic nem aprovada por ela. Depende de um endpoint não documentado, que pode mudar ou parar de funcionar a qualquer momento.
