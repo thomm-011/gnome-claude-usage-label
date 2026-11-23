@@ -22,7 +22,7 @@ Outras versões do GNOME não são suportadas: o `metadata.json` lista só a `42
 ## Instalação
 
 ```bash
-git clone https://github.com/<seu-usuario>/gnome-claude-usage-label.git
+git clone https://github.com/thomm-011/gnome-claude-usage-label.git
 cd gnome-claude-usage-label
 
 mkdir -p ~/.local/share/gnome-shell/extensions
