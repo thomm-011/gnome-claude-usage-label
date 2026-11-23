@@ -46,6 +46,7 @@ O texto deve aparecer na barra superior em alguns segundos.
 
 - A barra mostra `5h <percentual> · 7d <percentual>`: sua janela de 5 horas e o uso da semana.
 - Clique para ver quando cada limite reinicia, o horário da última consulta e o botão **Atualizar agora**.
+- Um ícone de asterisco laranja aparece antes do texto. Para usar o seu, troque o `claude-usage-label@local/icon.svg` (qualquer SVG) e reinicie o shell. Apague o arquivo para esconder o ícone.
 - Atualiza a cada 5 minutos.
 
 ### Mensagens de status
@@ -74,7 +75,7 @@ Não há interface. Edite as constantes no começo do `extension.js` e reinicie 
 - O token vai apenas para `api.anthropic.com` e nunca é registrado em log nem guardado em outro lugar.
 - Não há telemetria nem outra requisição de rede.
 
-O código é um arquivo só (`claude-usage-label@local/extension.js`, cerca de 185 linhas), então dá para ler em poucos minutos antes de instalar.
+O código é um arquivo só (`claude-usage-label@local/extension.js`, cerca de 200 linhas), então dá para ler em poucos minutos antes de instalar.
 
 ## Problemas comuns
 

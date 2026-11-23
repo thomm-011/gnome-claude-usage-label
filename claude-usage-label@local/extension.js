@@ -6,10 +6,12 @@
  * - Apenas LÊ ~/.claude/.credentials.json. Nunca renova o token nem escreve
  *   no arquivo: quem renova é o Claude Code quando você o usa.
  */
-const { GObject, St, GLib, Clutter } = imports.gi;
+const { GObject, St, GLib, Gio, Clutter } = imports.gi;
 imports.gi.versions.Soup = '2.4';
 const Soup = imports.gi.Soup;
 const ByteArray = imports.byteArray;
+const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
@@ -73,7 +75,19 @@ class ClaudeUsageIndicator extends PanelMenu.Button {
             text: 'Claude …',
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this.add_child(this._label);
+        // Optional icon: drop any icon.svg next to this file to customise it.
+        const box = new St.BoxLayout();
+        const iconFile = Gio.File.new_for_path(GLib.build_filenamev([Me.path, 'icon.svg']));
+        if (iconFile.query_exists(null)) {
+            box.add_child(new St.Icon({
+                gicon: new Gio.FileIcon({ file: iconFile }),
+                icon_size: 16,
+                y_align: Clutter.ActorAlign.CENTER,
+                style: 'margin-right: 6px;',
+            }));
+        }
+        box.add_child(this._label);
+        this.add_child(box);
 
         this._fiveItem = new PopupMenu.PopupMenuItem('Janela de 5h: …', { reactive: false });
         this._weekItem = new PopupMenu.PopupMenuItem('Semana: …', { reactive: false });

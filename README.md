@@ -46,6 +46,7 @@ The label should appear in the top bar within a few seconds.
 
 - The bar shows `5h <percent> · 7d <percent>`: your 5-hour window and your weekly usage.
 - Click it to see when each limit resets, the time of the last check, and an **Update now** button.
+- An orange asterisk icon is shown before the text. To use your own, replace `claude-usage-label@local/icon.svg` (any SVG) and restart the shell. Delete the file to hide the icon.
 - It refreshes every 5 minutes.
 
 ### Status messages
@@ -74,7 +75,7 @@ There is no UI. Edit the constants at the top of `extension.js`, then restart th
 - The token is sent only to `api.anthropic.com` and is never logged or stored elsewhere.
 - There is no telemetry and no other network request.
 
-The code is a single file (`claude-usage-label@local/extension.js`, about 185 lines), so you can read it in a few minutes before installing.
+The code is a single file (`claude-usage-label@local/extension.js`, about 200 lines), so you can read it in a few minutes before installing.
 
 ## Troubleshooting
 
