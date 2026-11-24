@@ -49,7 +49,7 @@ The label should appear in the top bar within a few seconds.
 - The bar shows `5h <percent> · 7d <percent>`: your 5-hour window and your weekly usage.
 - Click it to see when each limit resets, the time of the last check, and an **Update now** button.
 - An orange asterisk icon is shown before the text. To use your own, replace `claude-usage-label@local/icon.svg` (any SVG) and restart the shell. Delete the file to hide the icon.
-- It refreshes every 5 minutes.
+- It refreshes every 5 minutes. **Update now** runs at most once every 30 seconds; extra clicks are ignored.
 
 ### Status messages
 
@@ -58,6 +58,7 @@ The label should appear in the top bar within a few seconds.
 | `Claude: abra o Claude Code` | The access token expired. Use Claude Code once; it renews the token and the label recovers on the next refresh. |
 | `Claude: sem credenciais` / `sem token` | `~/.claude/.credentials.json` is missing or has no token. Log in with Claude Code. |
 | `Claude: sem rede` | No network connection. |
+| `Claude: limite, aguarde` | The server rate-limited the requests (HTTP 429). Checks pause for the time the server asks for (between 5 and 60 minutes, 10 minutes if it does not say) and resume on their own. |
 | `Claude: erro <code>` | The server answered with an HTTP error. |
 
 ### Settings
@@ -77,7 +78,16 @@ There is no UI. Edit the constants at the top of `extension.js`, then restart th
 - The token is sent only to `api.anthropic.com` and is never logged or stored elsewhere.
 - There is no telemetry and no other network request.
 
-The code is a single file (`claude-usage-label@local/extension.js`, about 200 lines), so you can read it in a few minutes before installing.
+The code is three small files in `claude-usage-label@local/`: `extension.js` (the panel and the request), `guard.js` (limits how often it queries) and `format.js` (validates the server's answer before it is shown), so you can read it in a few minutes before installing.
+
+## Tests
+
+The query limit and the response validation have tests that run with `gjs`, without GNOME Shell:
+
+```bash
+gjs tests/guard-test.js
+gjs tests/format-test.js
+```
 
 ## Troubleshooting
 

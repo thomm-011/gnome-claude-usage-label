@@ -12,6 +12,8 @@ const Soup = imports.gi.Soup;
 const ByteArray = imports.byteArray;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
+const { RefreshGuard, pauseSeconds } = Me.imports.guard;
+const { buildView } = Me.imports.format;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
@@ -36,25 +38,6 @@ function readToken() {
     } catch (e) {
         return { error: 'sem credenciais' };
     }
-}
-
-function remaining(iso) {
-    if (!iso)
-        return '';
-    const dt = GLib.DateTime.new_from_iso8601(iso, null);
-    if (!dt)
-        return '';
-    let secs = dt.to_unix() - GLib.DateTime.new_now_utc().to_unix();
-    if (secs <= 0)
-        return 'agora';
-    const d = Math.floor(secs / 86400);
-    const h = Math.floor((secs % 86400) / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    if (d > 0)
-        return `${d}d ${h}h`;
-    if (h > 0)
-        return `${h}h ${m}m`;
-    return `${m}m`;
 }
 
 function colorFor(pct) {
@@ -103,6 +86,7 @@ class ClaudeUsageIndicator extends PanelMenu.Button {
 
         this._session = new Soup.SessionAsync();
         this._session.timeout = 15;
+        this._guard = new RefreshGuard();
 
         this._refresh();
         this._timer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, INTERVAL_SECONDS, () => {
@@ -127,6 +111,10 @@ class ClaudeUsageIndicator extends PanelMenu.Button {
             return;
         }
 
+        const now = GLib.get_monotonic_time() / 1e6;
+        if (!this._guard.tryStart(now))
+            return;
+
         const message = Soup.Message.new('GET', USAGE_URL);
         message.request_headers.append('Authorization', `Bearer ${token}`);
         message.request_headers.append('anthropic-beta', 'oauth-2025-04-20');
@@ -134,8 +122,15 @@ class ClaudeUsageIndicator extends PanelMenu.Button {
         message.request_headers.append('User-Agent', 'claude-usage-label/1');
 
         this._session.queue_message(message, (_session, msg) => {
+            this._guard.finish();
             if (this._destroyed)
                 return;
+            if (msg.status_code === 429) {
+                this._guard.pause(GLib.get_monotonic_time() / 1e6,
+                    pauseSeconds(msg.response_headers.get_one('Retry-After')));
+                this._setError('limite, aguarde');
+                return;
+            }
             if (msg.status_code === 401) {
                 this._setError('abra o Claude Code');
                 return;
@@ -153,18 +148,12 @@ class ClaudeUsageIndicator extends PanelMenu.Button {
     }
 
     _update(data) {
-        const five = data.five_hour || {};
-        const week = data.seven_day || {};
-        const p5 = Math.round(five.utilization || 0);
-        const p7 = Math.round(week.utilization || 0);
+        const view = buildView(data);
 
-        this._label.set_text(`5h ${p5}% · 7d ${p7}%`);
-        this._label.style = `color: ${colorFor(Math.max(p5, p7)) || 'inherit'};`;
-
-        const r5 = remaining(five.resets_at);
-        const r7 = remaining(week.resets_at);
-        this._fiveItem.label.set_text(`Janela de 5h: ${p5}%${r5 ? `  (reinicia em ${r5})` : ''}`);
-        this._weekItem.label.set_text(`Semana: ${p7}%${r7 ? `  (reinicia em ${r7})` : ''}`);
+        this._label.set_text(view.label);
+        this._label.style = `color: ${(view.peak !== null && colorFor(view.peak)) || 'inherit'};`;
+        this._fiveItem.label.set_text(view.five);
+        this._weekItem.label.set_text(view.week);
         this._checkItem.label.set_text(`Última consulta: ${new Date().toLocaleTimeString()}`);
     }
 

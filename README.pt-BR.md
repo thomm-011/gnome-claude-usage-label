@@ -49,7 +49,7 @@ O texto deve aparecer na barra superior em alguns segundos.
 - A barra mostra `5h <percentual> · 7d <percentual>`: sua janela de 5 horas e o uso da semana.
 - Clique para ver quando cada limite reinicia, o horário da última consulta e o botão **Atualizar agora**.
 - Um ícone de asterisco laranja aparece antes do texto. Para usar o seu, troque o `claude-usage-label@local/icon.svg` (qualquer SVG) e reinicie o shell. Apague o arquivo para esconder o ícone.
-- Atualiza a cada 5 minutos.
+- Atualiza a cada 5 minutos. **Atualizar agora** roda no máximo uma vez a cada 30 segundos; cliques extras são ignorados.
 
 ### Mensagens de status
 
@@ -58,6 +58,7 @@ O texto deve aparecer na barra superior em alguns segundos.
 | `Claude: abra o Claude Code` | O token de acesso expirou. Use o Claude Code uma vez: ele renova o token e o texto volta na próxima atualização. |
 | `Claude: sem credenciais` / `sem token` | O `~/.claude/.credentials.json` não existe ou não tem token. Faça login no Claude Code. |
 | `Claude: sem rede` | Sem conexão com a internet. |
+| `Claude: limite, aguarde` | O servidor limitou as requisições (HTTP 429). As consultas pausam pelo tempo que o servidor pedir (entre 5 e 60 minutos, 10 minutos se ele não disser) e voltam sozinhas. |
 | `Claude: erro <código>` | O servidor respondeu com erro HTTP. |
 
 ### Configurações
@@ -77,7 +78,16 @@ Não há interface. Edite as constantes no começo do `extension.js` e reinicie 
 - O token vai apenas para `api.anthropic.com` e nunca é registrado em log nem guardado em outro lugar.
 - Não há telemetria nem outra requisição de rede.
 
-O código é um arquivo só (`claude-usage-label@local/extension.js`, cerca de 200 linhas), então dá para ler em poucos minutos antes de instalar.
+O código são três arquivos pequenos em `claude-usage-label@local/`: `extension.js` (o painel e a requisição), `guard.js` (limita a frequência das consultas) e `format.js` (valida a resposta do servidor antes de mostrá-la), então dá para ler em poucos minutos antes de instalar.
+
+## Testes
+
+O limite de consultas e a validação da resposta têm testes que rodam com `gjs`, sem o GNOME Shell:
+
+```bash
+gjs tests/guard-test.js
+gjs tests/format-test.js
+```
 
 ## Problemas comuns
 
